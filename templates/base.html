@@ -15,7 +15,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Tus estilos propios -->
-  <link href="{% static 'css/style.css' %}" rel="stylesheet">
+  <link href="{% static 'css/sidebar.css' %}" rel="stylesheet">
 
   <title>{% block title %}GestDocu{% endblock %}</title>
 </head>
@@ -43,14 +43,14 @@
           <li class="accordion">
             <a href="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false"
               aria-controls="collapseOne" class="collapsible">
-              <span class="icon-home mr-3"></span>Feed
+              <span class="icon-home mr-3"></span>Gestionar Usuarios
             </a>
             <div id="collapseOne" class="collapse" aria-labelledby="headingOne">
               <div>
                 <ul>
-                  <li><a href="#">News</a></li>
-                  <li><a href="#">Sport</a></li>
-                  <li><a href="#">Health</a></li>
+                  <li><a href="{% url 'accounts:roles_list' %}">Roles</a></li>
+                  <li><a href="#">Usuarios</a></li>
+                  <li><a href="#">Crear Usuarios</a></li>
                 </ul>
               </div>
             </div>
@@ -73,7 +73,7 @@
           <li><a href="#"><span class="icon-notifications mr-3"></span>Notifications</a></li>
           <li><a href="#"><span class="icon-location-arrow mr-3"></span>Direct</a></li>
           <li><a href="#"><span class="icon-pie-chart mr-3"></span>Stats</a></li>
-          <li><a href="{% url 'logout' %}"><span class="icon-sign-out mr-3"></span>Sign out</a></li>
+          <li><a href="{% url 'logout' %}"><span class="icon-sign-out mr-3"></span>Cerrar Sesion</a></li>
         </ul>
       </div>
     </div>
@@ -98,6 +98,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
 
   <!-- Tus scripts -->
-  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/sidebar.js' %}"></script>
 </body>
 </html>
