@@ -6,4 +6,16 @@
 <div class="container mt-4">
     <h1 class="mb-4">Eliminar Relación Caso-Cliente</h1>
     <div class="alert alert-warning" role="alert">
-        <p>¿Estás seguro de que quieres eliminar la relación del cliente "<strong>{{ tiene_instance.cliente.user.nombre_completo }}</strong>" con el caso "
+        <p>¿Estás seguro de que quieres eliminar la relación del cliente 
+           "<strong>{{ tiene_instance.cliente.user.nombre_completo }}</strong>" 
+           con el caso "<strong>{{ tiene_instance.caso.nro_caso }} - {{ tiene_instance.caso.tipo_de_caso|default:"Sin tipo" }}</strong>"?
+        </p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+        <a href="{% url 'tiene_list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

@@ -9,6 +9,7 @@ from .serializers import TipoDocumentoSerializer, DocumentoSerializer, TieneSeri
 from django.contrib import messages
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.db.models import ProtectedError
 # --- Vistas para TipoDocumento ---
 
 @permission_classes([IsAuthenticated])
@@ -54,9 +55,15 @@ def tipo_documento_update(request, pk):
 def tipo_documento_delete(request, pk):
     tipo_documento = get_object_or_404(TipoDocumento, pk=pk)
     if request.method == 'POST':
-        tipo_documento.delete()
-        messages.success(request, 'Tipo de documento eliminado exitosamente.')
-        return redirect('tipo_documento_list')
+        try:
+            tipo_documento.delete()
+            messages.success(request, 'Tipo de documento eliminado exitosamente.')
+            return redirect('tipo_documento_list')
+        except ProtectedError:
+            messages.error(request, 
+                           f'No se puede eliminar el tipo de documento "{tipo_documento.nombre}" '
+                           'porque tiene documentos asociados. Primero reasigne o elimine los documentos relacionados.')
+            return redirect('tipo_documento_list') # O puedes redirigir de nuevo a la página de confirmación con el error
     context = {'tipo_documento': tipo_documento}
     return render(request, 'visualizacion_expedientes/tipo_documento_confirm_delete.html', context)
 
@@ -71,8 +78,11 @@ def documento_list(request):
 @permission_classes([IsAuthenticated])
 def documento_create(request):
     if request.method == 'POST':
-        # Para FileField, Django REST Framework maneja los archivos en request.FILES
-        serializer = DocumentoSerializer(data=request.POST, files=request.FILES)
+        # CORRECCIÓN: Combina POST y FILES en un solo diccionario
+        data = request.POST.copy()  # Crea una copia mutable
+        data.update(request.FILES)  # Añade los archivos al diccionario
+        
+        serializer = DocumentoSerializer(data=data)
         if serializer.is_valid():
             # Asignar el usuario actual como 'creado_por'
             serializer.save(creado_por=request.user)
@@ -96,7 +106,11 @@ def documento_create(request):
 def documento_update(request, pk):
     documento = get_object_or_404(Documento, pk=pk)
     if request.method == 'POST':
-        serializer = DocumentoSerializer(documento, data=request.POST, files=request.FILES)
+        # CORRECCIÓN: Combina POST y FILES en un solo diccionario
+        data = request.POST.copy()  # Crea una copia mutable
+        data.update(request.FILES)  # Añade los archivos al diccionario
+        
+        serializer = DocumentoSerializer(documento, data=data)
         if serializer.is_valid():
             serializer.save()
             messages.success(request, 'Documento actualizado exitosamente.')
@@ -185,6 +199,7 @@ def tiene_delete(request, pk):
         return redirect('tiene_list')
     context = {'tiene_instance': tiene_instance}
     return render(request, 'visualizacion_expedientes/tiene_confirm_delete.html', context)
+
 # --- Tu vista de visualización jerárquica ---
 @login_required
 def expedientes_jerarquicos(request):

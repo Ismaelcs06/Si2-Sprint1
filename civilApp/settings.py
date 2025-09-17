@@ -7,18 +7,24 @@ Más info:
 https://docs.djangoproject.com/en/5.2/topics/settings/
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+from google.oauth2 import service_account 
 from pathlib import Path
 import os
+import environ #
 # === Paths ===
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
+env = environ.Env(
+    GS_BUCKET_NAME=(str, ''),
+    GS_PROJECT_ID=(str, ''),
+    GS_CREDENTIALS_PATH=(str, ''),
+)
+# >>>> ADD THIS LINE <<<<
+# Lee el archivo .env si existe
+environ.Env.read_env(BASE_DIR / '.env')
 # === Seguridad (IMPORTANTE en producción) ===
 SECRET_KEY = 'django-insecure-eq$c3^lr17r6btsvw^fh2@@cg73a)m#u*h!@&5@$i*mz@3buz)'
 DEBUG = True
-ALLOWED_HOSTS = []  # en prod, agrega tu dominio o IP
-
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 # === Aplicaciones instaladas ===
 INSTALLED_APPS = [
@@ -33,7 +39,7 @@ INSTALLED_APPS = [
     # Tus apps
     'pages',
     'accounts',
-    'gestdocu','visualizacion_expedientes',
+    'gestdocu','visualizacion_expedientes','storages',
 ]
 
 
@@ -122,7 +128,40 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'    # para producción (collectstatic)
 
 # === Archivos subidos por usuarios (MEDIA) ===
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# MEDIA_ROOT ya no se usa cuando se configura STORAGES para 'default'
+
+# === Configuración MODERNA para Google Cloud Storage (GCS) ===
+# Usa GCS para el almacenamiento de archivos, tanto en desarrollo como en producción.
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
+        "OPTIONS": {
+            "bucket_name": env("GS_BUCKET_NAME"),
+            "project_id": env("GS_PROJECT_ID"),
+            # Añade esta línea para cargar las credenciales directamente
+            "credentials": service_account.Credentials.from_service_account_file(
+                env('GS_CREDENTIALS_PATH')
+            ) if env('GS_CREDENTIALS_PATH') else None,
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+GS_CREDENTIALS_PATH = env('GS_CREDENTIALS_PATH')
+if GS_CREDENTIALS_PATH:
+    # Convierte a ruta absoluta para evitar problemas
+    cred_path = BASE_DIR / GS_CREDENTIALS_PATH
+    if cred_path.exists():
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(cred_path)
+        print(f"[DEBUG] Credenciales cargadas desde: {cred_path}") # <-- Línea de depuración
+    else:
+        print(f"[ERROR] Archivo de credenciales NO ENCONTRADO en: {cred_path}") # <-- Línea de depuración
+        # Opcional: Lanza un error para detener la ejecución si las credenciales son críticas
+        # raise FileNotFoundError(f"Archivo de credenciales no encontrado: {cred_path}")
+
+
 
 
 # === Configuración por defecto de clave primaria ===

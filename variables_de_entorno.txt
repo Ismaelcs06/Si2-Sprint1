@@ -1,0 +1,4 @@
+
+GS_BUCKET_NAME=mi-app-juridica-documentos
+GS_PROJECT_ID=Proyecto2-2025
+GS_CREDENTIALS_PATH=proyecto2-2025-cef6c7dd9580.json

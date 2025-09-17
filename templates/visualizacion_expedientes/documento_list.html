@@ -38,11 +38,8 @@
                         <td>{{ doc.expediente.codigo }} (Caso: {{ doc.expediente.caso.nro_caso }})</td>
                         <td>{{ doc.tipo.nombre }}</td>
                         <td>
-                            {% if doc.archivo %}
-                                <a href="{{ doc.archivo.url }}" target="_blank">Ver Archivo</a>
-                            {% else %}
-                                N/A
-                            {% endif %}
+                         
+                         
                         </td>
                         <td>{{ doc.fecha_subida|date:"d M Y H:i" }}</td>
                         <td>{{ doc.creado_por.nombre_completo }}</td>
