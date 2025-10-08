@@ -15,8 +15,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # === Seguridad (IMPORTANTE en producción) ===
-SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = False
+SECRET_KEY = 'clave_secreta_temporal_para_local'
+DEBUG = True
 ALLOWED_HOSTS = ['*']  # en prod, agrega tu dominio o IP
 
 
