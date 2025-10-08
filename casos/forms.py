@@ -34,6 +34,7 @@ class ExpedienteForm(forms.ModelForm):
             'autoridad',
             'estado',
             'observaciones',
+            'caso',
         ]
         widgets = {
             'fecha_de_creacion': forms.SelectDateWidget(years=range(1900, date.today().year + 10)),
